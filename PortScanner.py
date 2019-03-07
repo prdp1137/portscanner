@@ -2,65 +2,69 @@ import argparse
 from socket import *
 # Usage : python PortScanner.py -a 192.168.43.2 -p 21,80
 
-def printBanner(connSock,tgtPort):
+def printBanner(socketConnection,targetPort):
 	try:
-		if (tgtPort == 80):
-			connSock.send("GET / HTTP/1.1 \r\n")
+		if (targetPort == 80):
+			socketConnection.send("GET / HTTP/1.1\r\n\r\n")
+		elif (targetPort == 443):
+			socketConnection.send("GET / HTTPS/1.1\r\n\r\n")
 		else:
-			connSock.send("\r\n")
-		results = connSock.recv(4096)
+			socketConnection.send("\r\n")
+		results = socketConnection.recv(4096)
 
 		print '[+] Banner : ' + str(results)
 	except:
 		print '[-] Banner not available\n'
 
-def connScan(tgtHost,tgtPort):
+def connScan(targetHost,targetPort):
 	try:
-		connSock=socket(AF_INET,SOCK_STREAM)
+		socketConnection=socket(AF_INET,SOCK_STREAM)
 		# try to connect with the target
-		connSock.connect((tgtHost,tgtPort))
-		print'[+] %d tcp open'% tgtPort
-		printBanner(connSock,tgtPort)
+		socketConnection.connect((targetHost,targetPort))
+		print'[+] %d tcp open'% targetPort
+		printBanner(socketConnection,targetPort)
 	except:
 		# Print the failure results
-		print '[-] %d tcp closed '% tgtPort
+		print '[-] %d tcp closed '% targetPort
 	finally:
 		# Close the socket object
-		connSock.close()
+		socketConnection.close()
 
-def portScan(tgtHost,tgtPorts):
+def portScan(targetHost,targetPorts):
 	try:
 		# if -a was not an IP address this will resolve it to an IP
-		tgtIP = gethostbyname(tgtHost)
+		targetIP = gethostbyname(targetHost)
 	except :
 		print "[-] Error : Unknown Host"
 		exit(0)
 
 	try:
 		#if the domain can be resolved that's good, the results will be something like:
-		tgtName = gethostbyaddr(tgtIP)
+		tgtName = gethostbyaddr(targetIP)
+		print "[+] Simple Port Scanner by 0xyg3n."
 		print "[+] --- Scan result for : " + tgtName[0] + " --- "
 
 	except:
-		print "[+] --- Scan result for : " + tgtIP + " --- "
+		print "[+] Simple Port Scanner by 0xyg3n."
+		print "[+] --- Scan result for : " + targetIP + " --- "
 
 	setdefaulttimeout(10)
 
 	# For each port number call the connScan function
-	for tgtPort in tgtPorts:
-		connScan(tgtHost , int(tgtPort))
+	for targetPort in targetPorts:
+		connScan(targetHost , int(targetPort))
 
 def main():
 	# Parse the command line arguments
-	parser = argparse.ArgumentParser('Simple Port Scanner by Pr0d33p.')
+	parser = argparse.ArgumentParser('Simple Port Scanner by 0xyg3n.')
 	parser.add_argument("-a","--address",type=str, help="The target IP Address",default="127.0.0.1")
 	parser.add_argument("-p","--port",type=str,help="The port number to connect with",default="4444")
 	args = parser.parse_args()
 
 	# Store the argument values
-	ipaddress = args.address
+	ipAddress = args.address
 	portNumbers = args.port.split(',')
 
-	portScan(ipaddress,portNumbers)
+	portScan(ipAddress,portNumbers)
 if __name__ == "__main__":
 	main()

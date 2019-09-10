@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import argparse
 from socket import *
 # Usage : python PortScanner.py -a 192.168.43.2 -p 21,80
